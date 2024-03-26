@@ -12,11 +12,11 @@ def extractSTFT(audio):
     return s_scale
 
 def extractMelSpectrogram(audio):
-    mel_spectrogram = librosa.feature.melspectrogram(y=audio, n_mels=128, hop_length=HOP_SIZE, n_fft=FRAME_SIZE)
+    mel_spectrogram = librosa.feature.melspectrogram(y=audio, hop_length=HOP_SIZE, n_fft=FRAME_SIZE)
     return mel_spectrogram
 
 def extractMFCC(audio):
-    mfccs2 = librosa.feature.mfcc(y=audio, n_mfcc=10, hop_length=HOP_SIZE, n_fft=FRAME_SIZE)
+    mfccs2 = librosa.feature.mfcc(y=audio, hop_length=HOP_SIZE, n_fft=FRAME_SIZE)
     return mfccs2
 
 def extractScalogram(audio):
@@ -29,7 +29,7 @@ def extractScalogram(audio):
 def plotSpectogram(spectrogram, title, sr, hop_length, y_axis='log'):
     y_db = librosa.amplitude_to_db(np.abs(spectrogram), ref=np.max)
     plt.figure(figsize=(25,10))
-    librosa.display.specshow(y_db, sr=sr, hop_length=hop_length, x_axis='time', y_axis=y_axis)
+    librosa.display.specshow(y_db, sr=sr, hop_length=hop_length, x_axis='time', y_axis=y_axis, cmap='magma')
     plt.colorbar(format='%+2.0f dB')
     plt.xlabel('Time (s)')
     plt.ylabel('Frequency (Hz)')
@@ -46,7 +46,7 @@ def plotScalogram(audio, scalogram, freq, title, sr):
     plt.show()
 
 def main():
-    wildfire_sound = 'Data/WildFire/split audio 4-20210504T123341Z-001/split audio 4/videoplayback (1)_02.wav'
+    wildfire_sound = 'Data\WildFire\drive-download-20210504T145639Z-001\Split Files\y2mate.com - DD Ambience  Building on Fire  Blaze Inferno Wood Cracking Collapsing Loud Stressing_01.wav'
 
     ipd.Audio(wildfire_sound)
 
