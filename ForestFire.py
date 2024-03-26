@@ -26,7 +26,7 @@ def main():
 
     s_scale = extractSTFT(wildfire)
 
-    Y_log_scale = librosa.power_to_db(np.abs(s_scale) ** 2)
+    Y_log_scale = librosa.amplitude_to_db(np.abs(s_scale), ref=np.max)
 
     plotSpectogram(Y_log_scale=Y_log_scale, sr=sr, hop_length=HOP_SIZE, y_axis='log')
 
