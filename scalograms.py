@@ -44,13 +44,6 @@ plt.xlabel('Time (s)')
 plt.ylabel('Frequency (Hz)')
 plt.title('Mel Spectrogram')
 
-# Plot MFCC
-plt.subplot(1, 4, 4)  
-mfccs2 = librosa.feature.mfcc(y=audio_data2, sr=sample_rate2, n_mfcc=10, hop_length=1, n_fft=1024)
-librosa.display.specshow(mfccs2, sr=sample_rate2, x_axis='time', cmap='magma')
-plt.colorbar()
-plt.title('MFCC')
-
 # Plot Morlet Wavelet Scalogram
 plt.subplot(1, 4, 3)
 plt.imshow(scalogram2, extent=[0, len(audio_data2)/sample_rate2, freqs2[-1], freqs2[0]], aspect='auto', cmap='magma', interpolation='bilinear', norm='log')
@@ -58,6 +51,13 @@ plt.colorbar(label='Intensity')
 plt.xlabel('Time (s)')
 plt.ylabel('Scale')
 plt.title('Morlet Wavelet Scalogram')
+
+# Plot MFCC
+plt.subplot(1, 4, 4)  
+mfccs2 = librosa.feature.mfcc(y=audio_data2, sr=sample_rate2, n_mfcc=10, hop_length=1, n_fft=1024)
+librosa.display.specshow(mfccs2, sr=sample_rate2, x_axis='time', cmap='magma')
+plt.colorbar()
+plt.title('MFCC')
 
 plt.tight_layout()
 
