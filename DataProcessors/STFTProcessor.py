@@ -1,5 +1,5 @@
 import librosa
-from DataProcessing.SpectrogramProcessor import SpectrogramProcessor
+from DataProcessors.SpectrogramProcessor import SpectrogramProcessor
 import numpy as np
 
 class STFTProcessor(SpectrogramProcessor):
