@@ -3,21 +3,21 @@ import IPython.display as ipd
 import os
 import numpy as np
 from Model.CNN import CNN
-from DataProcessing.Utils import Utils
+from DataProcessors.Utils import Utils
 
 def main():
     # This commented block creates spectrograms. Uncomment and change spectrogram type and directory
     # to create other types of spectrograms.
     '''
     input_nofire_dir = 'Pre-processed Data\\NoFire\\Environment'
-    stft_output_nofire_dir = 'Spectrograms\\STFT\\NoFire'
+    stft_output_nofire_dir = 'Spectrograms\\mel\\NoFire'
      
-    utils.process_audio_directory(spectrogram_type='STFT', 
+    utils.process_audio_directory(spectrogram_type='mel', 
                            input_dir=input_nofire_dir, 
                             output_dir=stft_output_nofire_dir) 
     '''
     # Load Spectrograms
-    spectrograms, labels = Utils.load_data(input_dir='Spectrograms\\STFT')
+    spectrograms, labels = Utils.load_data(input_dir='Spectrograms\\mel')
 
     # Train model
     cnn = CNN()

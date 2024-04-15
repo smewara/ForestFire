@@ -1,10 +1,10 @@
 import os
 import numpy as np
 import matplotlib.pyplot as plt
-from DataProcessing.STFTProcessor import STFTProcessor
-from DataProcessing.MelProcessor import MelProcessor
-from DataProcessing.MFCCProcessor import MFCCProcessor
-from DataProcessing.CWTProcessor import CWTProcessor
+from DataProcessors.STFTProcessor import STFTProcessor
+from DataProcessors.MelProcessor import MelProcessor
+from DataProcessors.MFCCProcessor import MFCCProcessor
+from DataProcessors.CWTProcessor import CWTProcessor
 
 class Utils:
     
