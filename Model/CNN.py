@@ -8,6 +8,7 @@ class CNN:
     def __init__(self):
         self.model = None
 
+<<<<<<< HEAD
     def _build_model(self, input_shape):
         # Define input layer with the specified input shape
         inputs = Input(shape=input_shape)
@@ -35,6 +36,8 @@ class CNN:
         # Compile the model
         self.model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])
 
+=======
+>>>>>>> 1c357e214b6e2bf6fa9fbe761ccbf9abb83f87bc
     def train(self, spectrograms, labels, epochs, model_output_path):
         # Shuffle data indices
         indices = np.arange(len(spectrograms))
@@ -66,7 +69,11 @@ class CNN:
         input_shape = X_train.shape[1:]
 
         # Build the model
+<<<<<<< HEAD
         self._build_model(input_shape)  
+=======
+        self._build_model(input_shape)  # Call private method to build the model
+>>>>>>> 1c357e214b6e2bf6fa9fbe761ccbf9abb83f87bc
 
         # Train the model
         self.model.fit(X_train, y_train, epochs=epochs, batch_size=32, validation_data=(X_val, y_val))
@@ -78,6 +85,7 @@ class CNN:
         # Save the trained model
         self.model.save(model_output_path)
 
+<<<<<<< HEAD
     def load_model(self, model_path):
         return tf.keras.models.load_model(model_path)
     
@@ -96,3 +104,31 @@ class CNN:
         else: return 'no-fire'
 
     
+=======
+    def _build_model(self, input_shape):
+        # Define input layer with the specified input shape
+        inputs = Input(shape=input_shape)
+
+        # Convolutional layers
+        x = Conv2D(32, (3, 3), activation='relu')(inputs)
+        x = MaxPooling2D((2, 2))(x)
+        x = Conv2D(64, (3, 3), activation='relu')(x)
+        x = MaxPooling2D((2, 2))(x)
+        x = Conv2D(128, (3, 3), activation='relu')(x)
+        x = MaxPooling2D((2, 2))(x)
+
+        # Flatten layer to prepare for fully connected layers
+        x = Flatten()(x)
+
+        # Fully connected layers (dense layers)
+        x = Dense(128, activation='relu')(x)
+        
+        # Output layer with sigmoid activation for binary classification
+        outputs = Dense(1, activation='sigmoid')(x)
+
+        # Create the model
+        self.model = Model(inputs=inputs, outputs=outputs)
+
+        # Compile the model
+        self.model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])
+>>>>>>> 1c357e214b6e2bf6fa9fbe761ccbf9abb83f87bc
