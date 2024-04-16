@@ -162,8 +162,12 @@ cython_debug/
 # Data folder
 Data/
 Data/Pre-processed Data
+<<<<<<< HEAD
 Data/Pre-Processed Data
 Data/Spectrograms
 
 # Models
 *.keras
+=======
+Data/Spectrograms
+>>>>>>> 373a8238 (references fix)
