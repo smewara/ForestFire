@@ -6,11 +6,7 @@ class STFTProcessor(SpectrogramProcessor):
     def __init__(self, n_fft=2048, hop_length=512):
         super().__init__(n_fft=n_fft, hop_length=hop_length)
         
-<<<<<<< HEAD
     def compute_segmented_spectrograms(self, audio_path):
-=======
-    def compute_spectrogram(self, audio_path):
->>>>>>> 1c357e214b6e2bf6fa9fbe761ccbf9abb83f87bc
         # Load audio file
         y, sr = librosa.load(audio_path)
 
@@ -33,12 +29,7 @@ class STFTProcessor(SpectrogramProcessor):
 
         return spectrograms
 
-<<<<<<< HEAD
     def compute_spectrogram(self, audio_path):
         # Load audio file
         y, sr = librosa.load(audio_path)
         return np.abs(librosa.stft(y=y, n_fft=self.n_fft, hop_length=self.hop_length))
-    
-=======
-   
->>>>>>> 1c357e214b6e2bf6fa9fbe761ccbf9abb83f87bc
