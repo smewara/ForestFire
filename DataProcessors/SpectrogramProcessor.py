@@ -25,7 +25,10 @@ class SpectrogramProcessor:
 
     def compute_spectrogram(self, audio_path):
         raise NotImplementedError("Subclasses must implement compute_spectrogram method")
-    
+
+    def compute_segmented_spectrograms(self, audio_path):
+        raise NotImplementedError("Subclasses must implement compute_spectrogram method")
+
     def save_spectrogram(self, spectrograms, output_dir, filename):
         os.makedirs(output_dir, exist_ok=True)
 

@@ -1,7 +1,9 @@
 import librosa
-from DataProcessing.SpectrogramProcessor import SpectrogramProcessor
+from DataProcessors.SpectrogramProcessor import SpectrogramProcessor
 
 class MFCCProcessor(SpectrogramProcessor):
+    def __init__(self, n_fft=2048, hop_length=512):
+        super().__init__(n_fft=n_fft, hop_length=hop_length)
     
     def compute_spectrogram(self, audio_path):
         y, sr = librosa.load(audio_path)

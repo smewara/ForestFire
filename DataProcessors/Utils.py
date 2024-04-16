@@ -27,8 +27,8 @@ class Utils:
             elif (spectrogram_type.upper() == 'CWT') :
                 processor = CWTProcessor()
                 
-            spectrograms = processor.compute_spectrogram(audio_path=input_path)
-            
+            spectrograms = processor.compute_segmented_spectrograms(audio_path=input_path)
+
             # Save spectrogram to output directory
             output_filename = os.path.splitext(file)[0]  # Remove file extension
             processor.save_spectrogram(spectrograms, output_dir, output_filename)
@@ -41,10 +41,10 @@ class Utils:
         labels = []
 
         for subdir in subdirs:
-            if 'fire' in subdir.lower():
-                label = 1 # fire
-            elif 'nofire' in subdir.lower():
+            if 'NOFIRE' in subdir.upper():
                 label = 0 # no-fire
+            elif 'FIRE' in subdir.upper():
+                label = 1 # fire
 
             spectrogram_files = [file for file in os.listdir(subdir) if file.endswith('.npy')]
 
