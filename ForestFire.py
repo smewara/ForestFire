@@ -1,4 +1,5 @@
 from Model.CNN import CNN
+from DataProcessors.Utils import Utils
 from DataProcessors.STFTProcessor import STFTProcessor
 
 def main():
@@ -22,14 +23,13 @@ def main():
     cnn = CNN()
     # The below code loads the spectrograms and trains CNN model. Uncomment the block to
     # train your own model and give a name to the model
-    '''
+
     # Load Spectrograms
     spectrograms, labels = Utils.load_data(input_dir='Data\\Spectrograms\\STFT')
 
     # Train model
     cnn.train(spectrograms=spectrograms, labels=labels, epochs=10, model_output_path='Model\\Model_STFT_10.keras')
-    
-    '''
+
     # Predict on Rainforest spectrogram
     stft = STFTProcessor()
     spectrogram = stft.compute_spectrogram('Data\\Pre-processed Data\\NoFire\\Rainforest\\0a4e7e350_4.wav')
