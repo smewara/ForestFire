@@ -1,10 +1,11 @@
 import librosa
 from DataProcessors.SpectrogramProcessor import SpectrogramProcessor
+import numpy as np
 
 class MelProcessor(SpectrogramProcessor):
     def __init__(self, n_fft=2048, hop_length=512):
         super().__init__(n_fft=n_fft, hop_length=hop_length)
-                                                                                                                            ²   ²   ²²  
+
     def compute_spectrogram(self, audio_path):
         # Load audio file
         y, sr = librosa.load(audio_path)
@@ -14,12 +15,12 @@ class MelProcessor(SpectrogramProcessor):
         segments = SpectrogramProcessor.split_audio_into_segments(y=y, sr=sr, duration=3, overlap=0.5)
 
         # Compute Mel spectrograms from segments      
-        mel_spectrogram = self.compute_spectrogram_from_segments(segments)
+        spectrograms = self.compute_spectrogram_from_segments(segments)
         
-        return mel_spectrogram
+        return spectrograms
     
 def compute_spectrogram_from_segments(self, segments):
-    mel_spectrogram = []
+    spectrograms = []
 
     # Compute Mel for each segment
     for start_time, segment in segments:
@@ -27,4 +28,4 @@ def compute_spectrogram_from_segments(self, segments):
         magnitude = np.abs(mel)
         mel_spectrogram.append((magnitude, start_time))
 
-    return mel_spectrogram
+    return spectrograms
