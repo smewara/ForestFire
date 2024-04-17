@@ -24,7 +24,7 @@ class MelProcessor(SpectrogramProcessor):
 
         # Compute Mel for each segment
         for start_time, segment in segments:
-            mel = librosa.feature.melspectrogram(segment, n_fft=self.n_fft, hop_length=self.hop_length)
+            mel = librosa.feature.melspectrogram(y=segment, n_fft=self.n_fft, hop_length=self.hop_length)
             magnitude = np.abs(mel)
             mel_spectrogram.append((magnitude, start_time))
 
