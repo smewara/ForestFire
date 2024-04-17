@@ -8,10 +8,10 @@ class STFTProcessor(SpectrogramProcessor):
         
     def compute_segmented_spectrograms(self, audio_path):
         # Load audio file
-        y, sr = librosa.load(audio_path)
+        y, sr = super().normalize_audio(audio_path=audio_path)
 
         # Split audio into segments
-        segments = SpectrogramProcessor.split_audio_into_segments(y=y, sr=sr, duration=3, overlap=0.5)
+        segments = super().split_audio_into_segments(y=y, sr=sr, duration=3, overlap=0.5)
 
         # Compute STFT spectrograms from segments
         spectrograms = self.compute_spectrogram_from_segments(segments)

@@ -1,6 +1,7 @@
 import librosa
 import os
 import numpy as np
+import pyloudnorm
 import matplotlib.pyplot as plt
 
 class SpectrogramProcessor:
@@ -9,7 +10,15 @@ class SpectrogramProcessor:
         self.n_fft = n_fft
         self.hop_length = hop_length
 
-    def split_audio_into_segments(y, sr, duration=3, overlap=0.5):
+    def normalize_audio(self, audio_path, target_loudness=-23.0):
+        # Load audio file
+        audio, sr = librosa.load(audio_path)
+
+        # TODO: Normalize loudness
+
+        return audio, sr
+    
+    def split_audio_into_segments(self, y, sr, duration=3, overlap=0.5):
         segment_samples = int(duration * sr)
         hop_length = int(segment_samples * (1 - overlap))
 
@@ -36,7 +45,7 @@ class SpectrogramProcessor:
             segment_filename = f"{filename}_{index}"
             np.save(os.path.join(output_dir, segment_filename), spectrogram)
 
-    def plot_spectrogram(spectrogram, title, sr, hop_length, y_axis='log'):
+    def plot_spectrogram(self, spectrogram, title, sr, hop_length, y_axis='log'):
         y_db = librosa.amplitude_to_db(np.abs(spectrogram), ref=np.max)
         plt.figure(figsize=(25,10))
         librosa.display.specshow(y_db, sr=sr, hop_length=hop_length, x_axis='time', y_axis=y_axis, cmap='magma')
@@ -46,7 +55,7 @@ class SpectrogramProcessor:
         plt.title(title)
         plt.show()
 
-    def plot_scalogram(audio, scalogram, freq, title, sr):
+    def plot_scalogram(self, audio, scalogram, freq, title, sr):
         plt.subplot(1, 4, 3)
         plt.imshow(scalogram, extent=[0, len(audio)/sr, freq[-1], freq[0]], aspect='auto', cmap='magma', interpolation='bilinear', norm='log')
         plt.colorbar(label='Intensity')

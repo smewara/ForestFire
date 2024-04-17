@@ -8,7 +8,7 @@ class CWTProcessor(SpectrogramProcessor):
         super().__init__(n_fft=n_fft, hop_length=hop_length)
         
     def compute_spectrogram(self, audio_path):
-        y, sr = librosa.load(audio_path)
+        y, sr = super().normalize_audio(audio_path=audio_path)
         wavelet = 'morl'  # Morlet wavelet
         scales = np.arange(1, 128)  # Adjusted scales
         coeffs, freqs = pywt.cwt(y, scales, wavelet)

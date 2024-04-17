@@ -7,18 +7,18 @@ def main():
     # to create other types of spectrograms.
     '''
     input_fire_dir = 'Data\\Pre-processed Data\\Fire'
-    stft_output_fire_dir = 'Data\\Spectrograms\\STFT\\Fire'
+    mfcc_output_fire_dir = 'Data\\Spectrograms\\STFT\\Fire'
      
     Utils.process_audio_directory(spectrogram_type='STFT', 
                            input_dir=input_fire_dir, 
-                            output_dir=stft_output_fire_dir) 
+                            output_dir=mfcc_output_fire_dir) 
     
     input_nofire_dir = 'Data\\Pre-processed Data\\NoFire\\Environment'
-    stft_output_nofire_dir = 'Data\\Spectrograms\\STFT\\NoFire'
+    mfcc_output_nofire_dir = 'Data\\Spectrograms\\STFT\\NoFire'
      
     Utils.process_audio_directory(spectrogram_type='STFT', 
                            input_dir=input_nofire_dir, 
-                            output_dir=stft_output_nofire_dir) 
+                            output_dir=mfcc_output_nofire_dir) 
     '''
     cnn = CNN()
     # The below code loads the spectrograms and trains CNN model. Uncomment the block to
@@ -31,8 +31,8 @@ def main():
     cnn.train(spectrograms=spectrograms, labels=labels, epochs=10, model_output_path='Model\\Model_STFT_10.keras')
 
     # Predict on Rainforest spectrogram
-    s = STFTProcessor()
-    spectrogram = s.compute_spectrogram('Data\\Pre-processed Data\\Fire\\1_10140.wav')
+    stft = STFTProcessor()
+    spectrogram = stft.compute_spectrogram('Data\\Pre-processed Data\\NoFire\\Rainforest\\0a4e7e350_4.wav')
 
     model = cnn.load_model('Model\\Model_STFT_10.keras')
     predictions = cnn.predict(spectrogram=spectrogram, model=model)
@@ -40,4 +40,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-

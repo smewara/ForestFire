@@ -14,11 +14,11 @@ class CNN:
 
         # Convolutional layers
         x = Conv2D(32, (3, 3), activation='relu')(inputs)
-        x = MaxPooling2D((2, 2))(x)
+        x = MaxPooling2D((2, 2), padding='same')(x)
         x = Conv2D(64, (3, 3), activation='relu')(x)
-        x = MaxPooling2D((2, 2))(x)
+        x = MaxPooling2D((2, 2), padding='same')(x)
         x = Conv2D(128, (3, 3), activation='relu')(x)
-        x = MaxPooling2D((2, 2))(x)
+        x = MaxPooling2D((2, 2), padding='same')(x)
 
         # Flatten layer to prepare for fully connected layers
         x = Flatten()(x)

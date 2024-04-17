@@ -8,7 +8,7 @@ class MelProcessor(SpectrogramProcessor):
 
     def compute_segmented_spectrograms(self, audio_path):
         # Load audio file
-        y, sr = librosa.load(audio_path)
+        y, sr = super().normalize_audio(audio_path=audio_path)
         #The load method returns two variables, the time series (y) and the sample rate (sr), which is the number of samples per second.
 
         # Split audio into segments
@@ -24,7 +24,7 @@ class MelProcessor(SpectrogramProcessor):
 
         # Compute Mel for each segment
         for start_time, segment in segments:
-            mel = librosa.feature.melspectrogram(segment, n_fft=self.n_fft, hop_length=self.hop_length)
+            mel = librosa.feature.melspectrogram(y=segment, n_fft=self.n_fft, hop_length=self.hop_length)
             magnitude = np.abs(mel)
             mel_spectrogram.append((magnitude, start_time))
 
