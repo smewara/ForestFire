@@ -6,8 +6,7 @@ class MelProcessor(SpectrogramProcessor):
     def __init__(self, n_fft=2048, hop_length=512):
         super().__init__(n_fft=n_fft, hop_length=hop_length)
 
-
-    def compute_spectrogram(self, audio_path):
+    def compute_segmented_spectrograms(self, audio_path):
         # Load audio file
         y, sr = librosa.load(audio_path)
         #The load method returns two variables, the time series (y) and the sample rate (sr), which is the number of samples per second.
