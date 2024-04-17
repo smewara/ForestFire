@@ -28,7 +28,7 @@ def main():
     spectrograms, labels = Utils.load_data(input_dir='Data\\Spectrograms\\MEL')
 
     # Train model
-    cnn.train(spectrograms=spectrograms, labels=labels, epochs=1, model_output_path='Model\\Model_MEL_10.keras')
+    cnn.train(spectrograms=spectrograms, labels=labels, epochs=10, model_output_path='Model\\Model_MEL_10.keras')
 
     # Predict on Rainforest spectrogram
     mel = MelProcessor()
