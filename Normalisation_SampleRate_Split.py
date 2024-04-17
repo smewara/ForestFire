@@ -22,6 +22,10 @@ def normalize_audio(input_folder, output_folder, target_loudness=-23):
             # Load audio file
             audio, sample_rate = sf.read(input_file)
             
+            # Convert to mono
+            if audio.ndim > 1:
+                audio = librosa.to_mono(audio)
+                
             # Measure loudness
             meter = pyloudnorm.Meter(sample_rate)
             
