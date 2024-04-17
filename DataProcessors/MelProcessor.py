@@ -29,3 +29,9 @@ class MelProcessor(SpectrogramProcessor):
             mel_spectrogram.append((magnitude, start_time))
 
         return mel_spectrogram
+    
+    def compute_spectrogram(self, audio_path):
+        # Load audio file
+        y, sr = librosa.load(audio_path)
+        return np.abs(librosa.feature.melspectrogram(y=y, n_fft=self.n_fft, hop_length=self.hop_length))
+
