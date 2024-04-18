@@ -3,6 +3,7 @@ import os
 import numpy as np
 import pyloudnorm
 import matplotlib.pyplot as plt
+import soundfile as sf
 
 class SpectrogramProcessor:
     
@@ -10,13 +11,18 @@ class SpectrogramProcessor:
         self.n_fft = n_fft
         self.hop_length = hop_length
 
-    def normalize_audio(self, audio_path, target_loudness=-23.0):
-        # Load audio file
-        audio, sr = librosa.load(audio_path)
-
-        # TODO: Normalize loudness
-
-        return audio, sr
+    def normalize_audio(audio, sample_rate, target_loudness=-23):
+        # Measure loudness
+        meter = pyloudnorm.Meter(sample_rate)
+        loudness = meter.integrated_loudness(audio)
+        
+        # Convert to mono
+        if audio.ndim > 1:
+            audio = np.mean(audio, axis=1)
+    
+        # Normalize audio
+        normalized_audio = pyloudnorm.normalize.loudness(audio, loudness, target_loudness)
+        return normalized_audio
     
     def split_audio_into_segments(self, y, sr, duration=3, overlap=0.5):
         segment_samples = int(duration * sr)
