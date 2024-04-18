@@ -11,11 +11,14 @@ class SpectrogramProcessor:
         self.n_fft = n_fft
         self.hop_length = hop_length
 
-    def normalize_audio(audio, sample_rate, target_loudness=-23):
+    def normalize_audio(self, audio_path, target_loudness=-23):
+        # Load audio file
+        audio, _ = librosa.load(audio_path, sr=sample_rate)
+    
         # Measure loudness
         meter = pyloudnorm.Meter(sample_rate)
         loudness = meter.integrated_loudness(audio)
-        
+    
         # Convert to mono
         if audio.ndim > 1:
             audio = np.mean(audio, axis=1)
@@ -23,6 +26,7 @@ class SpectrogramProcessor:
         # Normalize audio
         normalized_audio = pyloudnorm.normalize.loudness(audio, loudness, target_loudness)
         return normalized_audio
+
     
     def split_audio_into_segments(self, y, sr, duration=3, overlap=0.5):
         segment_samples = int(duration * sr)
