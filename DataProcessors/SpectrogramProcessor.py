@@ -1,7 +1,6 @@
 import librosa
 import os
 import numpy as np
-import pyloudnorm
 import matplotlib.pyplot as plt
 
 class SpectrogramProcessor:
