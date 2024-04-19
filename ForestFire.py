@@ -1,6 +1,3 @@
-from Model.CNN import CNN
-from DataProcessors.Utils import Utils
-from DataProcessors.STFTProcessor import STFTProcessor
 from Model.TestMetrics import TestMetrics
 
 def generateAndSaveSpectrograms():
@@ -31,7 +28,7 @@ def trainCNNModel():
     spectrograms, labels = Utils.load_data(input_dir='Data\\Spectrograms\\STFT')
 
     # Train model
-    cnn.train(spectrograms=spectrograms, labels=labels, epochs=1, model_output_path='Model\\Model_STFT_1.keras')
+    cnn.train(spectrograms=spectrograms, labels=labels, epochs=1, model_output_path='Model\\Model_STFT_10.keras')
     '''
 
 def testModel():
