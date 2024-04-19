@@ -14,11 +14,11 @@ class STFTProcessor(SpectrogramProcessor):
         segments = super().split_audio_into_segments(y=y, sr=sr, duration=3, overlap=0.5)
 
         # Compute STFT spectrograms from segments
-        spectrograms = self.compute_spectrogram_from_segments(segments)
+        spectrograms = self._compute_spectrogram_from_segments(segments)
 
         return spectrograms
     
-    def compute_spectrogram_from_segments(self, segments):
+    def _compute_spectrogram_from_segments(self, segments):
         spectrograms = []
 
         # Compute STFT for each segment

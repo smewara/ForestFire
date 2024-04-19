@@ -5,6 +5,7 @@ from DataProcessors.STFTProcessor import STFTProcessor
 from DataProcessors.MelProcessor import MelProcessor
 from DataProcessors.MFCCProcessor import MFCCProcessor
 from DataProcessors.CWTProcessor import CWTProcessor
+from moviepy.editor import AudioFileClip
 
 class Utils:
     
@@ -58,3 +59,9 @@ class Utils:
         labels = np.array(labels)
 
         return spectrograms, labels 
+
+    def convert_m4a_to_wav(input_file, output_file):
+        audio = AudioFileClip(input_file)
+        audio.write_audiofile(output_file)
+
+        print(f"Conversion completed: {output_file}")

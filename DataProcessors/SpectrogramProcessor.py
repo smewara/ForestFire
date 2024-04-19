@@ -14,7 +14,8 @@ class SpectrogramProcessor:
         # Load audio file
         audio, sr = librosa.load(audio_path)
 
-        # TODO: Normalize loudness
+        # TODO: Normalize loudness such that peak amplitude is 1
+        audio = librosa.util.normalize(audio)
 
         return audio, sr
     

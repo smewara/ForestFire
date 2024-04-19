@@ -12,14 +12,14 @@ class MFCCProcessor(SpectrogramProcessor):
         #The load method returns two variables, the time series (y) and the sample rate (sr), which is the number of samples per second.
 
         # Split audio into segments
-        segments = SpectrogramProcessor.split_audio_into_segments(y=y, sr=sr, duration=3, overlap=0.5)
+        segments = super().split_audio_into_segments(y=y, sr=sr, duration=3, overlap=0.5)
 
         # Compute MFCC spectrograms from segments      
-        mfcc_spectrogram = self.compute_spectrogram_from_segments(segments)
+        mfcc_spectrogram = self._compute_spectrogram_from_segments(segments)
         
         return mfcc_spectrogram
     
-    def compute_spectrogram_from_segments(self, segments):
+    def _compute_spectrogram_from_segments(self, segments):
         mfcc_spectrogram = []
 
         # Compute MFCC for each segment
