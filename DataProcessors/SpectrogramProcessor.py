@@ -17,6 +17,26 @@ class SpectrogramProcessor:
 
         return audio, sr
     
+    def compute_pitch_shifting(input_dir, n_steps=4, bins_per_octave=12):
+        for file in os.listdir(input_dir):
+            if file.endswith('.wav') or file.endswith('.mp3'):
+                # Load the audio
+                file_path = os.path.join(input_dir, file)
+                y, sr = librosa.load(file_path)
+
+                # Apply pitch shifting
+                pitchShifted_audio = librosa.effects.pitch_shift(y, sr=sr, n_steps=n_steps, bins_per_octave=bins_per_octave)
+
+                # Construct output filepath
+                output_filename = os.path.splitext(file)[0] + '_shifted.wav'
+                output_path = os.path.join(input_dir, output_filename)
+
+                # Save shifted audio
+                sf.write(output_path, pitchShifted_audio, sr)
+
+    input_dir = 'Data\\Pre-processed Data\\Fire\\Train'
+    compute_pitch_shifting(input_dir)
+    
     def split_audio_into_segments(self, y, sr, duration=3, overlap=0.5):
         segment_samples = int(duration * sr)
         hop_length = int(segment_samples * (1 - overlap))
