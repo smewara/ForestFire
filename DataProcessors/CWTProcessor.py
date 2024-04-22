@@ -1,27 +1,36 @@
-import os
-import librosa
 import pywt
 import numpy as np
-import soundfile as sf
-import pyloudnorm
 from scipy.signal import resample
 from DataProcessors.SpectrogramProcessor import SpectrogramProcessor
 
-class CWTProcessor(SpectrogramProcessor):
+class CWTScalogramProcessor(SpectrogramProcessor):
     def __init__(self, n_fft=2048, hop_length=512, wavelet='morl', num_scales=128, target_size=(128, 1050)):
         super().__init__(n_fft=n_fft, hop_length=hop_length)
         self.wavelet = wavelet
         self.num_scales = num_scales
         self.target_size = target_size
 
-    def normalize_audio(self, audio_path, sample_rate):
-        y, sr = librosa.load(audio_path, sr=sample_rate)
-        meter = pyloudnorm.Meter(sr)
-        loudness = meter.integrated_loudness(y)
-        if y.ndim > 1:
-            y = np.mean(y, axis=1)
-        normalized_audio = pyloudnorm.normalize.loudness(y, loudness, -23)
-        return normalized_audio, sr
+    def compute_segmented_spectrograms(self, audio_path):
+        # Load audio file
+        y, sr = super().normalize_audio(audio_path=audio_path)
+
+        # Split audio into segments
+        segments = super().split_audio_into_segments(y=y, sr=sr, duration=3, overlap=0.5)
+
+        # Compute CWT scalograms from segments
+        spectrograms = self._compute_scalogram_from_segments(segments, sr)
+
+        return spectrograms
+
+    def _compute_scalogram_from_segments(self, segments, sr):
+        spectrograms = []
+
+        # Compute CWT scalogram for each segment
+        for start_time, segment in segments:
+            scalogram, freqs = self.compute_cwt_scalogram_single(segment, sr)
+            spectrograms.append((scalogram, start_time))
+
+        return spectrograms
 
     def compute_cwt_scalogram_single(self, audio, sample_rate):
         scales = np.linspace(1, self.num_scales, self.num_scales, dtype=int)
@@ -37,12 +46,3 @@ class CWTProcessor(SpectrogramProcessor):
         resampled_scalogram = resample(resampled_scalogram, self.target_size[1], axis=1)
 
         return resampled_scalogram, freqs
-
-    def compute_spectrogram(self, audio_path):
-        audio, sr = self.normalize_audio(audio_path, sample_rate=16000)
-        segments = self.split_audio_into_segments(audio, sr)
-        spectrograms = []
-        for segment, start_time in segments:
-            scalogram, freqs = self.compute_cwt_scalogram_single(segment, sr)
-            spectrograms.append((scalogram, start_time))
-        return spectrograms
