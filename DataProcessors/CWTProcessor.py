@@ -3,7 +3,7 @@ import numpy as np
 from scipy.signal import resample
 from DataProcessors.SpectrogramProcessor import SpectrogramProcessor
 
-class CWTScalogramProcessor(SpectrogramProcessor):
+class CWTProcessor(SpectrogramProcessor):
     def __init__(self, n_fft=2048, hop_length=512, wavelet='morl', num_scales=128, target_size=(128, 1050)):
         super().__init__(n_fft=n_fft, hop_length=hop_length)
         self.wavelet = wavelet
