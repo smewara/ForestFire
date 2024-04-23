@@ -46,14 +46,12 @@ def trainCNNModel(spectrogram_type, no_of_layers, no_epochs):
     # Train model
     cnn.train(spectrograms=spectrograms, labels=labels, no_of_layers=no_of_layers, epochs=no_epochs, model_output_path=f'Model\\Model_{no_of_layers}D_{spectrogram_type}_{no_epochs}.keras')
 
-def testModel(spectrogram_type, model_path):
-    # Define base folder for test data
+def get_test_spectrograms_and_labels(spectrogram_type, ):
+     # Define base folder for test data
     base_folder = 'Data//Pre-processed Data//Test//'
-
     true_labels = []
     true_labels_no_fire = []
     true_labels_fire = []
-    testMetrics = TestMetrics(model_path=model_path, spectrogram_type=spectrogram_type)
     processor = Utils.get_data_processor(spectrogram_type=spectrogram_type)
     
     # Process 'no-fire' (Rainforest) spectrograms
@@ -72,15 +70,26 @@ def testModel(spectrogram_type, model_path):
                                                       save=False) 
     true_labels.extend(['fire'] * len(spectrograms_fire))
     spectrograms.extend(spectrograms_fire)
-    
+    return spectrograms, true_labels
+
+def testModel(spectrogram_type, model_path):
+    testMetrics = TestMetrics(model_path=model_path, spectrogram_type=spectrogram_type)
+    spectrograms, true_labels = get_test_spectrograms_and_labels(spectrogram_type=spectrogram_type)
     # Evaluate the model using test metrics
     testMetrics.PrintTestMetrics(spectrograms=spectrograms, true_labels=true_labels)
 
+def print_model_summary(model_path):
+    model = CNN().load_model(model_path=model_path)
+    print('{model_path}\n')
+    print(model.summary())
+    
 def main():
     spectrogram_type = 'STFT'
+    model_path = 'Model\Model_2D_STFT_10.keras'
     #generateAndSaveSpectrograms(spectrogram_type=spectrogram_type)
-    #trainCNNModel(spectrogram_type=spectrogram_type, no_of_layers=3, no_epochs=10)
-    testModel(spectrogram_type=spectrogram_type, model_path='Model\Model_3D_STFT_10.keras')
+    #trainCNNModel(spectrogram_type=spectrogram_type, no_of_layers=2, no_epochs=10)
+    #testModel(spectrogram_type=spectrogram_type, model_path='Model\Model_2D_STFT_10.keras')
+    #print_model_summary(model_path)
 
 if __name__ == "__main__":
     main()
