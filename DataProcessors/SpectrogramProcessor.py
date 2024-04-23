@@ -11,13 +11,11 @@ class SpectrogramProcessor:
 
     def normalize_audio(self, audio_path, target_loudness=-23.0):
         # Load audio file
-        audio, sr = librosa.load(audio_path)
-
-        # TODO: Normalize loudness
+        audio, sr = librosa.load(audio_path, sr = 16000)
 
         return audio, sr
     
-    def split_audio_into_segments(self, y, sr, duration=3, overlap=0.5):
+    def split_audio_into_segments(self, y, sr, duration=2.5, overlap=0.5):
         segment_samples = int(duration * sr)
         hop_length = int(segment_samples * (1 - overlap))
 
@@ -34,7 +32,7 @@ class SpectrogramProcessor:
     def compute_spectrogram(self, audio_path):
         raise NotImplementedError("Subclasses must implement compute_spectrogram method")
 
-    def compute_segmented_spectrograms(self, audio_path):
+    def compute_segmented_spectrograms(self, audio_path, duration_in_sec=2.5):
         raise NotImplementedError("Subclasses must implement compute_spectrogram method")
 
     def save_spectrogram(self, spectrograms, output_dir, filename):
