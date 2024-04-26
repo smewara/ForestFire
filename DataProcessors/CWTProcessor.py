@@ -4,45 +4,54 @@ from scipy.signal import resample
 from DataProcessors.SpectrogramProcessor import SpectrogramProcessor
 
 class CWTProcessor(SpectrogramProcessor):
-    def __init__(self, n_fft=2048, hop_length=512, wavelet='morl', num_scales=128, target_size=(128, 1050)):
+    def __init__(self, n_fft=2048, hop_length=512, wavelet='morl', num_scales=64, target_size=(64, 512)):
         super().__init__(n_fft=n_fft, hop_length=hop_length)
         self.wavelet = wavelet
         self.num_scales = num_scales
         self.target_size = target_size
 
-    def compute_segmented_spectrograms(self, audio_path):
+    def compute_segmented_scalograms(audio_file, output_dir, filename, wavelet='morl', num_scales=64, target_loudness=-23, target_size=(64, 512)):
         # Load audio file
-        y, sr = super().normalize_audio(audio_path=audio_path)
+        y, sr = librosa.load(audio_file, sr=16000, mono=True)
 
+        # Apply normalisation and augmentation
+        augmented_audio_list = super().normalize_and_augment_audio(audio_file, output_dir, target_loudness=-23, low_pass_freq=100)
+        
+        # Loop through normalised and augmented files
+        for idx, augmented_audio in enumerate(augmented_audio_list):
+        
         # Split audio into segments
-        segments = super().split_audio_into_segments(y=y, sr=sr, duration=3, overlap=0.5)
+            segments = super().split_audio_into_segments(audio, sample_rate, duration=2.5, overlap=0.5, min_segment_length=2.5):
 
-        # Compute CWT scalograms from segments
-        spectrograms = self._compute_scalogram_from_segments(segments, sr)
+            for segment, start_time in segments:
 
-        return spectrograms
+                # Compute CWT scalograms from segments
+                segment_scalogram, _ = compute_cwt_scalogram_single(segment, sr, wavelet, num_scales, target_size)
+                
+                unique_id = str(uuid.uuid4())[:8]
+            
+                # Construct the filename with a unique code
+                segment_filename = f"{os.path.splitext(filename)[0]}_{idx}_{start_time:.2f}_{unique_id}"
+                
+                os.makedirs(output_dir, exist_ok=True)
+                np.save(os.path.join(output_dir, f"{segment_filename}_scalogram.npy"), segment_scalogram)
 
-    def _compute_scalogram_from_segments(self, segments, sr):
-        spectrograms = []
+        return None
 
-        # Compute CWT scalogram for each segment
-        for start_time, segment in segments:
-            scalogram, freqs = self.compute_cwt_scalogram_single(segment, sr)
-            spectrograms.append((scalogram, start_time))
-
-        return spectrograms
-
-    def compute_cwt_scalogram_single(self, audio, sample_rate):
-        scales = np.linspace(1, self.num_scales, self.num_scales, dtype=int)
-        coeffs, freqs = pywt.cwt(audio, scales, self.wavelet)
+    def compute_cwt_scalogram_single(audio, sample_rate, wavelet='morl', num_scales=64, target_size=(64, 512)):
+        scales = np.linspace(1, 64, num_scales, dtype=int)
+        coeffs, freqs = pywt.cwt(audio, scales, wavelet)
         scalogram = np.abs(coeffs) ** 2
-
-        padded_scalogram = np.zeros((self.num_scales, coeffs.shape[1]))
+        
+        # Zero-pad the scalogram to a fixed size
+        padded_scalogram = np.zeros((num_scales, coeffs.shape[1]))
         padded_scalogram[:scalogram.shape[0], :scalogram.shape[1]] = scalogram
-
+        
+        # Normalize the scalogram
         padded_scalogram = (padded_scalogram - padded_scalogram.min()) / (padded_scalogram.max() - padded_scalogram.min())
-
-        resampled_scalogram = resample(padded_scalogram, self.target_size[0], axis=0)
-        resampled_scalogram = resample(resampled_scalogram, self.target_size[1], axis=1)
-
+        
+        # Resample the scalogram to the target size
+        resampled_scalogram = resample(padded_scalogram, target_size[0], axis=0)
+        resampled_scalogram = resample(resampled_scalogram, target_size[1], axis=1)
+        
         return resampled_scalogram, freqs
