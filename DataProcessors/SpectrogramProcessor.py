@@ -9,11 +9,44 @@ class SpectrogramProcessor:
         self.n_fft = n_fft
         self.hop_length = hop_length
 
-    def normalize_audio(self, audio_path, target_loudness=-23.0):
+    def normalize_and_augment_audio(self, audio_file, output_dir, target_loudness=-23, low_pass_freq=20000):
+        os.makedirs(output_dir, exist_ok=True)
         # Load audio file
         audio, sr = librosa.load(audio_path, sr = 16000)
 
-        return audio, sr
+        # Normalize audio
+        meter = pyloudnorm.Meter(sr)
+        loudness = meter.integrated_loudness(y)
+        normalized_audio = pyloudnorm.normalize.loudness(y, loudness, target_loudness)
+    
+        # Low-pass filter
+        normalized_cutoff_frequency = low_pass_freq / (0.5 * sr)
+        sos = butter(10, normalized_cutoff_frequency, 'lp', fs=sr, output='sos')
+        filtered_audio = sosfilt(sos, normalized_audio)
+
+        # Create list of normalised audio + optional augmented audio
+        augmented_audio = [filtered_audio]
+
+        # Generate augmented audio and add to list
+        if np.random.rand() < 0.2:
+            # Pitch shift
+            pitch_shift_factor = np.random.uniform(-2, 2)
+            pitch_shifted_audio = librosa.effects.pitch_shift(filtered_audio, sr=16000, n_steps=pitch_shift_factor)
+            augmented_audio.append(pitch_shifted_audio)
+
+        if np.random.rand() < 0.2:
+            # Time stretch
+            stretch_rate = np.random.uniform(0.8, 1.2)
+            time_stretched_audio = librosa.effects.time_stretch(filtered_audio, rate=stretch_rate)
+            augmented_audio.append(time_stretched_audio)
+    
+        if np.random.rand() < 0.2:
+            # Volume adjustment
+            volume_adjustment = np.random.uniform(0.1, 0.8)
+            volume_adjusted_audio = filtered_audio * volume_adjustment
+            augmented_audio.append(volume_adjusted_audio)
+            
+        return augmented_audio
     
     def split_audio_into_segments(self, y, sr, duration=2.5, overlap=0.5):
         segment_samples = int(duration * sr)
