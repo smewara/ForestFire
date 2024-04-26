@@ -21,7 +21,7 @@ class CWTProcessor(SpectrogramProcessor):
         for idx, augmented_audio in enumerate(augmented_audio_list):
         
         # Split audio into segments
-            segments = super().split_audio_into_segments(audio, sample_rate, duration=2.5, overlap=0.5, min_segment_length=2.5):
+            segments = super().split_audio_into_segments(audio, sample_rate, duration=2.5, overlap=0.5):
 
             for segment, start_time in segments:
 
