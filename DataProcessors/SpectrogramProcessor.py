@@ -12,7 +12,8 @@ class SpectrogramProcessor:
     def normalize_and_augment_audio(self, audio_path, target_loudness=-10, low_pass_freq=30000):
         os.makedirs(output_dir, exist_ok=True)
         # Load audio file
-        audio, sr = librosa.load(audio_path, sr = 16000)
+        audio_file = os.path.join(audio_path, filename)
+        audio, sr = librosa.load(audio_file, sr = 16000)
 
         # Apply normalisation and filter to all
         
