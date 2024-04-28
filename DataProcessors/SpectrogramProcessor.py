@@ -9,11 +9,38 @@ class SpectrogramProcessor:
         self.n_fft = n_fft
         self.hop_length = hop_length
 
-    def normalize_audio(self, audio_path, target_loudness=-23.0):
+    def normalize_and_augment_audio(self, audio_path, target_loudness=-10, low_pass_freq=30000):
+        os.makedirs(output_dir, exist_ok=True)
         # Load audio file
         audio, sr = librosa.load(audio_path, sr = 16000)
 
-        return audio, sr
+        # Apply normalisation and filter to all
+        
+        # Normalize audio
+        meter = pyloudnorm.Meter(sr)
+        loudness = meter.integrated_loudness(y)
+        normalized_audio = pyloudnorm.normalize.loudness(audio, loudness, target_loudness)
+    
+        # Low-pass filter
+        normalized_cutoff_frequency = low_pass_freq / (0.5 * sr)
+        sos = butter(10, normalized_cutoff_frequency, 'lp', fs=sr, output='sos')
+        augmented_audio = sosfilt(sos, normalized_audio)
+
+        # Choose augmentation (comment out others)
+
+        # Pitch shift
+        pitch_shift_factor = np.random.uniform(-2, 2)
+        augmented_audio = librosa.effects.pitch_shift(filtered_audio, sr=16000, n_steps=pitch_shift_factor)
+
+        ## Time stretch
+        #stretch_rate = np.random.uniform(0.8, 1.2)
+        #augmented_audio = librosa.effects.time_stretch(filtered_audio, rate=stretch_rate)
+
+        ## Volume adjustment
+        #volume_adjustment = np.random.uniform(0.2, 0.8)
+        #augmented_audio = filtered_audio * volume_adjustment
+              
+        return augmented_audio, sr
     
     def split_audio_into_segments(self, y, sr, duration=2.5, overlap=0.5):
         segment_samples = int(duration * sr)
