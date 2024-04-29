@@ -35,26 +35,7 @@ class SpectrogramProcessor:
 
     def normalize_audio(self, audio_path, kind_of_augmentation = None, target_loudness=-23.0):
         # Load audio file
-        audio_file = os.path.join(audio_path, filename)
-        audio, sr = librosa.load(audio_file, sr = 16000)
-
-        # Apply normalisation and filter to all
-        
-        # Normalize audio
-        meter = pyloudnorm.Meter(sr)
-        loudness = meter.integrated_loudness(y)
-        normalized_audio = pyloudnorm.normalize.loudness(audio, loudness, target_loudness)
-    
-        # Low-pass filter
-        normalized_cutoff_frequency = low_pass_freq / (0.5 * sr)
-        sos = butter(10, normalized_cutoff_frequency, 'lp', fs=sr, output='sos')
-        augmented_audio = sosfilt(sos, normalized_audio)
-
-        # Choose augmentation (comment out others)
-
-        # Pitch shift
-        pitch_shift_factor = np.random.uniform(-2, 2)
-        augmented_audio = librosa.effects.pitch_shift(filtered_audio, sr=16000, n_steps=pitch_shift_factor)
+        audio, sr = librosa.load(audio_path, sr = 16000)
 
         if kind_of_augmentation is not None:
            audio = self.normalize_loudness(audio=audio, sr=sr)

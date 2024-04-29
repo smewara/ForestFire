@@ -1,3 +1,4 @@
+import uuid
 import pywt
 import numpy as np
 from scipy.signal import resample
@@ -15,20 +16,14 @@ class CWTProcessor(SpectrogramProcessor):
         y, sr = super().normalize_audio(audio_path=audio_path, kind_of_augmentation=kind_of_augmentation)
         
         # Split audio into segments
-            segments = super().split_audio_into_segments(audio, sample_rate, duration=2.5, overlap=0.5):
+        segments = super().split_audio_into_segments(y, sr, duration=2.5, overlap=0.5)
 
-            for segment, start_time in segments:
+        for segment, start_time in segments:
 
-                # Compute CWT scalograms from segments
-                segment_scalogram, _ = compute_cwt_scalogram_single(segment, sr, wavelet, num_scales, target_size)
+            # Compute CWT scalograms from segments
+            segment_scalogram, _ = self.compute_cwt_scalogram_single(segment, sr, self.wavelet, self.num_scales, self.target_size)
                 
-                unique_id = str(uuid.uuid4())[:8]
-            
-                # Construct the filename with a unique code
-                segment_filename = f"{os.path.splitext(filename)[0]}_{idx}_{start_time:.2f}_{unique_id}"
-                
-                os.makedirs(output_dir, exist_ok=True)
-                np.save(os.path.join(output_dir, f"{segment_filename}_scalogram.npy"), segment_scalogram)
+            unique_id = str(uuid.uuid4())[:8]
 
         return None
 
