@@ -1,5 +1,7 @@
 import os
+import librosa
 import numpy as np
+import soundfile as sf
 import matplotlib.pyplot as plt
 from DataProcessors.STFTProcessor import STFTProcessor
 from DataProcessors.MelProcessor import MelProcessor
@@ -7,8 +9,13 @@ from DataProcessors.MFCCProcessor import MFCCProcessor
 from DataProcessors.CWTProcessor import CWTProcessor
 from moviepy.editor import AudioFileClip
 
+from DataProcessors.SpectrogramProcessor import SpectrogramProcessor
+
 class Utils:
-    def get_data_processor(spectrogram_type):
+    def get_data_processor(spectrogram_type = None):
+        if spectrogram_type is None:
+            return SpectrogramProcessor()
+        
         # Extract spectrogram
         if (spectrogram_type.upper() == 'STFT') :
             processor = STFTProcessor()
@@ -24,9 +31,15 @@ class Utils:
         
         return processor
     
-    def process_audio_directory(spectrogram_type, input_dir, output_dir = None, duration_in_sec=2.5, save = False):
+    def process_audio_directory(spectrogram_type, 
+                                input_dir, 
+                                output_dir = None, 
+                                duration_in_sec=2.5, 
+                                save = False, 
+                                kind_of_augmentation = None):
         audio_files = [file for file in os.listdir(input_dir) if file.endswith('.wav')]
         all_spectrograms = []
+
 
         for file in audio_files:
             input_path = os.path.join(input_dir, file)
@@ -34,7 +47,8 @@ class Utils:
             # Extract spectrogram
             processor = Utils.get_data_processor(spectrogram_type)
             spectrograms = processor.compute_segmented_spectrograms(audio_path=input_path,
-                                                                    duration_in_sec=duration_in_sec)
+                                                                    duration_in_sec=duration_in_sec,
+                                                                    kind_of_augmentation=kind_of_augmentation)
             all_spectrograms.extend(spectrograms)
         
             if (save):
@@ -44,25 +58,34 @@ class Utils:
 
         return all_spectrograms
 
-    def load_data(input_dir):
-        subdirs = [os.path.join(input_dir, subdir) for subdir in os.listdir(input_dir) 
-                   if os.path.isdir(os.path.join(input_dir, subdir))]
+    def list_files_recursive(directory, with_augmentated_dir):
+        file_list = []
+        for root, dirs, files in os.walk(directory):
+            if with_augmentated_dir == False:
+                # Filter out directories containing 'Augmented'
+                dirs[:] = [un_augmented_dir for un_augmented_dir in dirs if 'Augmented' not in un_augmented_dir]
+            
+            for file in files:
+                file_path = os.path.join(root, file)
+                if file_path.endswith('.npy'):
+                    file_list.append(file_path)
+        return file_list
+    
+    def load_spectrograms(input_dir, with_augmentated_dir = True):
+        all_spectrogram_files = Utils.list_files_recursive(input_dir, with_augmentated_dir)
 
         spectrograms = []
         labels = []
 
-        for subdir in subdirs:
-            if 'NOFIRE' in subdir.upper():
+        for file in all_spectrogram_files:
+            if 'NOFIRE' in file.upper():
                 label = 0 # no-fire
-            elif 'FIRE' in subdir.upper():
+            elif 'FIRE' in file.upper():
                 label = 1 # fire
 
-            spectrogram_files = [file for file in os.listdir(subdir) if file.endswith('.npy')]
-
-            for file in spectrogram_files:
-                spectrogram = np.load(os.path.join(subdir, file))
-                spectrograms.append(spectrogram)
-                labels.append(label)
+            spectrogram = np.load(file)
+            spectrograms.append(spectrogram)
+            labels.append(label)
 
         # convert lists to numpy array
         spectrograms = np.array(spectrograms)
@@ -75,3 +98,15 @@ class Utils:
         audio.write_audiofile(output_file)
 
         print(f"Conversion completed: {output_file}")
+
+    def superimpose_audios(input_file_fire, input_file_background, output_dir, output_file):
+        audio_fire, sr1 = librosa.load(input_file_fire, sr=16000)
+        audio_background, sr2 = librosa.load(input_file_background, sr=16000)
+
+        min_length = min(len(audio_fire), len(audio_background))
+        audio_fire = audio_fire[:min_length]
+        audio_background = audio_background[:min_length]
+
+        superimposed_audio = (audio_fire * 0.7) + (audio_background * 0.3)
+        sf.write(os.path.join(output_dir, output_file), superimposed_audio, sr1)
+

@@ -2,6 +2,7 @@ import librosa
 import os
 import numpy as np
 import matplotlib.pyplot as plt
+import pyloudnorm
 
 class SpectrogramProcessor:
     
@@ -9,9 +10,44 @@ class SpectrogramProcessor:
         self.n_fft = n_fft
         self.hop_length = hop_length
 
-    def normalize_audio(self, audio_path, target_loudness=-23.0):
+    def normalize_loudness(self, audio, sr):
+        meter = pyloudnorm.Meter(sr)
+        loudness = meter.integrated_loudness(audio)
+        normalized_audio = pyloudnorm.normalize.loudness(audio, loudness, -10)
+        return normalized_audio
+
+    def pitch_shift(self, audio, sr):
+        # Pitch shift
+        pitch_shift_factor = np.random.uniform(-2, 2)
+        pitch_shifted_audio = librosa.effects.pitch_shift(audio, sr=sr, n_steps=pitch_shift_factor)
+        return pitch_shifted_audio, sr
+
+    def time_stretch(self, audio, sr):
+        # Time stretch
+        stretch_rate = np.random.uniform(0.8, 1.2)
+        time_stretched_audio = librosa.effects.time_stretch(audio, rate=stretch_rate)
+        return time_stretched_audio, sr
+    
+    def volume_adjusted(self, audio, sr):
+        volume_adjustment = np.random.uniform(0.2, 0.8)
+        augmented_audio = audio * volume_adjustment
+        return audio, sr
+
+    def normalize_audio(self, audio_path, kind_of_augmentation = None, target_loudness=-23.0):
         # Load audio file
         audio, sr = librosa.load(audio_path, sr = 16000)
+
+        if kind_of_augmentation is not None:
+           audio = self.normalize_loudness(audio=audio, sr=sr)
+           
+        if kind_of_augmentation == 'PitchShifted':
+            return self.pitch_shift(audio, sr)
+        elif kind_of_augmentation == 'Superimposed':
+            return audio, sr
+        elif kind_of_augmentation == 'VolumeAdjusted':
+            return self.volume_adjusted(audio, sr)
+        elif kind_of_augmentation == 'TimeStretched':
+            return self.time_stretch(audio, sr)
 
         return audio, sr
     

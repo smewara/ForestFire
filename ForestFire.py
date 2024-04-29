@@ -3,31 +3,20 @@ from DataProcessors.Utils import Utils
 from Model.CNN import CNN
 from Model.TestMetrics import TestMetrics
 
-def save_spectrogram(spectrogram_type, input_directory, output_directory):
+def save_spectrogram(spectrogram_type, input_directory, output_directory, kind_of_augmentation=None):
     Utils.process_audio_directory(spectrogram_type=spectrogram_type, 
                                   input_dir=input_directory, 
                                   output_dir=output_directory,
-                                  save=True) 
+                                  save=True,
+                                  kind_of_augmentation=kind_of_augmentation) 
     
-def generateAndSaveSpectrograms(spectrogram_type):
-    # This commented block creates spectrograms. Uncomment and change spectrogram type and directory
-    # to create other types of spectrograms. 
+def generateAndSaveSpectrograms(spectrogram_type, apply_augmentation=False):
+    # Fire 'Original + Augmented'
     save_spectrogram(spectrogram_type=spectrogram_type,
                      input_directory='Data\\Pre-processed Data\\Train\\Fire\\Original',
-                     output_directory=f'Data\\Spectrograms\\{spectrogram_type}\\Fire')
+                     output_directory=f'Data\\Spectrograms\\{spectrogram_type}\\Fire\\Original')
     
-    save_spectrogram(spectrogram_type=spectrogram_type,
-                     input_directory='Data\\Pre-processed Data\\Train\\Fire\\Augmented\\PitchShifted',
-                     output_directory=f'Data\\Spectrograms\\{spectrogram_type}\\Fire')
-    
-    save_spectrogram(spectrogram_type=spectrogram_type,
-                     input_directory='Data\\Pre-processed Data\\Train\\Fire\\Augmented\\TimeStretched',
-                     output_directory=f'Data\\Spectrograms\\{spectrogram_type}\\Fire')
-    
-    save_spectrogram(spectrogram_type=spectrogram_type,
-                     input_directory='Data\\Pre-processed Data\\Train\\Fire\\Augmented\\Superimposed',
-                     output_directory=f'Data\\Spectrograms\\{spectrogram_type}\\Fire')
-
+    #No-Fire
     save_spectrogram(spectrogram_type=spectrogram_type,
                      input_directory='Data\\Pre-processed Data\\Train\\NoFire\\Environment',
                      output_directory=f'Data\\Spectrograms\\{spectrogram_type}\\NoFire')
@@ -35,16 +24,41 @@ def generateAndSaveSpectrograms(spectrogram_type):
     save_spectrogram(spectrogram_type=spectrogram_type,
                      input_directory='Data\\Pre-processed Data\\Train\\NoFire\\Rainforest',
                      output_directory=f'Data\\Spectrograms\\{spectrogram_type}\\NoFire')
-    
-def trainCNNModel(spectrogram_type, no_of_layers, no_epochs):
+
+    #Augmented
+    if apply_augmentation:
+        #Pitch-shifted
+        save_spectrogram(spectrogram_type=spectrogram_type,
+                        input_directory='Data\\Pre-processed Data\\Train\\Fire\\Augmented\\PitchShifted',
+                        output_directory=f'Data\\Spectrograms\\{spectrogram_type}\\Fire\\Augmented\\PitchShifted',
+                        kind_of_augmentation='PitchShifted')
+        
+        #Time-streched
+        save_spectrogram(spectrogram_type=spectrogram_type,
+                        input_directory='Data\\Pre-processed Data\\Train\\Fire\\Augmented\\TimeStretched',
+                        output_directory=f'Data\\Spectrograms\\{spectrogram_type}\\Fire\\Augmented\\TimeStretched',
+                        kind_of_augmentation='TimeStretched')
+        
+        #Superimposed
+        save_spectrogram(spectrogram_type=spectrogram_type,
+                        input_directory='Data\\Pre-processed Data\\Train\\Fire\\Augmented\\Superimposed',
+                        output_directory=f'Data\\Spectrograms\\{spectrogram_type}\\Fire\\Augmented\\Superimposed',
+                        kind_of_augmentation='Superimposed')
+        
+        #Volume adjusted
+        save_spectrogram(spectrogram_type=spectrogram_type,
+                        input_directory='Data\\Pre-processed Data\\Train\\Fire\\Augmented\\Superimposed',
+                        output_directory=f'Data\\Spectrograms\\{spectrogram_type}\\Fire\\Augmented\\VolumeAdjusted',
+                        kind_of_augmentation='VolumeAdjusted')
+   
+def trainCNNModel(spectrogram_type, no_of_layers, no_epochs, apply_augmentation, model_path):
     # The below code loads the spectrograms and trains CNN model. Uncomment the block to
     # train your own model and give a name to the model
     cnn = CNN()
     # Load Spectrograms
-    spectrograms, labels = Utils.load_data(input_dir=f'Data\\Spectrograms\\{spectrogram_type}')
-
+    spectrograms, labels = Utils.load_spectrograms(input_dir=f'Data\\Spectrograms\\{spectrogram_type}', with_augmentated_dir=apply_augmentation)
     # Train model
-    cnn.train(spectrograms=spectrograms, labels=labels, no_of_layers=no_of_layers, epochs=no_epochs, model_output_path=f'Model\\Model_{no_of_layers}D_{spectrogram_type}_{no_epochs}.keras')
+    cnn.train(spectrograms=spectrograms, labels=labels, no_of_layers=no_of_layers, epochs=no_epochs, model_output_path=model_path)
 
 def get_test_spectrograms_and_labels(spectrogram_type, ):
      # Define base folder for test data
@@ -85,11 +99,14 @@ def print_model_summary(model_path):
     
 def main():
     spectrogram_type = 'STFT'
-    model_path = 'Model\Model_2D_STFT_10.keras'
-    #generateAndSaveSpectrograms(spectrogram_type=spectrogram_type)
-    #trainCNNModel(spectrogram_type=spectrogram_type, no_of_layers=2, no_epochs=10)
-    #testModel(spectrogram_type=spectrogram_type, model_path='Model\Model_2D_STFT_10.keras')
+    no_of_layers = 3
+    no_epochs = 10
+    apply_augmentation = True
+    model_path = f'Model\Model_{no_of_layers}D_{spectrogram_type}_{no_epochs}_{apply_augmentation}.keras'
+    #generateAndSaveSpectrograms(spectrogram_type=spectrogram_type, apply_augmentation=apply_augmentation)
+    #trainCNNModel(spectrogram_type=spectrogram_type, no_of_layers=no_of_layers, no_epochs=no_epochs, apply_augmentation=apply_augmentation, model_path=model_path)
     #print_model_summary(model_path)
+    testModel(spectrogram_type=spectrogram_type, model_path=model_path)
 
 if __name__ == "__main__":
     main()

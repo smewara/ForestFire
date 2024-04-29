@@ -1,6 +1,8 @@
 import tensorflow as tf
 from tensorflow.keras.models import Model
 from tensorflow.keras.layers import Input, Conv2D, MaxPooling2D, Flatten, Dense, Dropout
+from tensorflow.keras.preprocessing.image import img_to_array, array_to_img
+from tensorflow.keras.utils import normalize
 from sklearn.model_selection import train_test_split
 import numpy as np
 
@@ -43,12 +45,14 @@ class CNN:
         self.model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy', 'precision', 'recall'])
 
     def train(self, spectrograms, labels, no_of_layers, epochs, model_output_path):
+        processed_spectrograms = self.preprocess_spectrograms(spectrograms=spectrograms)
+
         # Shuffle data indices
-        indices = np.arange(len(spectrograms))
+        indices = np.arange(len(processed_spectrograms))
         np.random.shuffle(indices)
 
         # Use shuffled indices to reorder spectrograms and labels
-        shuffled_spectrograms = spectrograms[indices]
+        shuffled_spectrograms = processed_spectrograms[indices]
         shuffled_labels = labels[indices]
 
         # Split data into training, validation, and test sets
@@ -65,9 +69,12 @@ class CNN:
                                                           shuffle=True)
         
         # Reshape data to add channel dimension (assuming grayscale spectrograms)
-        X_train = X_train[..., np.newaxis]
-        X_val = X_val[..., np.newaxis]
-        X_test = X_test[..., np.newaxis]
+        if X_train.ndim == 3:
+            X_train = X_train[..., np.newaxis]
+        if X_val.ndim == 3:
+            X_val = X_val[..., np.newaxis]
+        if X_test.ndim == 3:
+            X_test = X_test[..., np.newaxis]
 
         # Get input shape
         input_shape = X_train.shape[1:]
@@ -88,15 +95,20 @@ class CNN:
     def load_model(self, model_path):
         return tf.keras.models.load_model(model_path)
     
-    def preprocess_spectrogram(self, spectrogram):
-        # Resize and reshape the spectrogram to match model input shape (1025, 79, 1)
-        resized_spectrogram = spectrogram[:, :79]  # Keep only the first 79 frames
-        reshaped_spectrogram = resized_spectrogram[..., np.newaxis]  # Add channel dimension
-        return reshaped_spectrogram
+    def resize_spectrogram(self, img):
+        if img.ndim == 2:
+            img = img[..., np.newaxis]
+        return img[:,:79]
+
+    def preprocess_spectrograms(self, spectrograms):
+        # Normalize the spectrograms
+        normalized_spectrograms = normalize(spectrograms, axis=1)
+        
+        return normalized_spectrograms
     
     def predict(self, spectrogram):
         # Reshape the spectrogram to match model input shape
-        preprocessed_spectrogram = self.preprocess_spectrogram(spectrogram)
+        preprocessed_spectrogram = self.resize_spectrogram(spectrogram)
         predictions = self.model.predict(np.expand_dims(preprocessed_spectrogram, axis=0))
         if (predictions > 0.5) :
             return 'fire'

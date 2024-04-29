@@ -6,9 +6,10 @@ class MFCCProcessor(SpectrogramProcessor):
     def __init__(self, n_fft=2048, hop_length=512):
         super().__init__(n_fft=n_fft, hop_length=hop_length)
 
-    def compute_segmented_spectrograms(self, audio_path, duration_in_sec=2.5):
+    def compute_segmented_spectrograms(self, audio_path, kind_of_augmentation = None, duration_in_sec=2.5):
         # Load audio file
-        y, sr = super().normalize_audio(audio_path=audio_path)
+        y, sr = super().normalize_audio(audio_path=audio_path, kind_of_augmentation=kind_of_augmentation)
+        
         #The load method returns two variables, the time series (y) and the sample rate (sr), which is the number of samples per second.
 
         # Split audio into segments

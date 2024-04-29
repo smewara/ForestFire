@@ -10,10 +10,10 @@ class CWTProcessor(SpectrogramProcessor):
         self.num_scales = num_scales
         self.target_size = target_size
 
-    def compute_segmented_spectrograms(self, audio_path):
+    def compute_segmented_spectrograms(self, audio_path, kind_of_augmentation = None, duration_in_sec=2.5):
         # Load audio file
-        y, sr = super().normalize_audio(audio_path=audio_path)
-
+        y, sr = super().normalize_audio(audio_path=audio_path, kind_of_augmentation=kind_of_augmentation)
+        
         # Split audio into segments
         segments = super().split_audio_into_segments(y=y, sr=sr, duration=3, overlap=0.5)
 
