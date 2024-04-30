@@ -31,23 +31,22 @@ class SpectrogramProcessor:
     def volume_adjusted(self, audio, sr):
         volume_adjustment = np.random.uniform(0.2, 0.8)
         augmented_audio = audio * volume_adjustment
-        return audio, sr
+        return augmented_audio, sr
 
     def normalize_audio(self, audio_path, kind_of_augmentation = None, target_loudness=-23.0):
         # Load audio file
         audio, sr = librosa.load(audio_path, sr = 16000)
 
         if kind_of_augmentation is not None:
-           audio = self.normalize_loudness(audio=audio, sr=sr)
-           
-        if kind_of_augmentation == 'PitchShifted':
-            return self.pitch_shift(audio, sr)
-        elif kind_of_augmentation == 'Superimposed':
-            return audio, sr
-        elif kind_of_augmentation == 'VolumeAdjusted':
-            return self.volume_adjusted(audio, sr)
-        elif kind_of_augmentation == 'TimeStretched':
-            return self.time_stretch(audio, sr)
+            audio = self.normalize_loudness(audio=audio, sr=sr)
+            if kind_of_augmentation == 'PitchShifted':
+                return self.pitch_shift(audio, sr)
+            elif kind_of_augmentation == 'Superimposed':
+                return audio, sr
+            elif kind_of_augmentation == 'VolumeAdjusted':
+                return self.volume_adjusted(audio, sr)
+            elif kind_of_augmentation == 'TimeStretched':
+                return self.time_stretch(audio, sr)
 
         return audio, sr
     
